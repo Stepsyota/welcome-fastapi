@@ -8,9 +8,13 @@ from app.movies.services import get_movie_from_db, sync_get_movie_from_db, creat
 
 router = APIRouter(prefix='/movies', tags=['Movies'])
 
+def get_connection():
+    return "Connection ok"
+
 @router.get("/{id}", response_model=MovieRead)
-async def get_movie(id : Annotated[int, Path(title= "The id of film", gt=0)]) -> dict:
+async def get_movie(id : Annotated[int, Path(title= "The id of film", gt=0)], connection = Depends(get_connection)) -> dict:
     dict_movie = await get_movie_from_db(id)
+    print(connection)
     return {"id" : id, **dict_movie}
     # return {"id" : id, "movie" : dict_movie.get("movie"), "year" : dict_movie.get("year")}.
     # !!! Оказывается, можно "распаковывать" словарь с помощью **dict
