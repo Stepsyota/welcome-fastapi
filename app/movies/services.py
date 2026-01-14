@@ -9,7 +9,19 @@ from app.movies.schemas import MovieCreate, MovieUpdate, MovieReplace
 
 async def get_movie_from_db(id : int):
     await asyncio.sleep(0.2 + (random.random() / 10))
-    return dict_movies.get(id)
+    movie = dict_movies.get(id)
+    if movie is None:
+        raise HTTPException(status_code=404, detail="Movie not found")
+    return movie
+
+async def get_movies_from_db(limit : int):
+    await asyncio.sleep(0.2 + (random.random() / 10))
+    list_movies = []
+    for i in range(1, limit + 1):
+        movie = dict_movies.get(i)
+        if movie is not None:
+            list_movies.append({"id" : i, **movie})
+    return list_movies
 
 def len_db():
     return len(dict_movies)
@@ -24,10 +36,10 @@ async def set_movie_to_db(model : MovieCreate):
 
 async def delete_movie_from_db(id : int):
     await asyncio.sleep(0.2 + (random.random() / 10))
-    dict_movie = dict_movies.pop(id)
-    if dict_movie is None:
+    if dict_movies.get(id) is None:
         raise HTTPException(status_code=404, detail="Movie not found")
-    return dict_movie
+    movie = dict_movies.pop(id)
+    return movie
 
 async def update_movie_from_db(id : int, model : MovieReplace):
     await asyncio.sleep(0.2 + (random.random() / 10))
