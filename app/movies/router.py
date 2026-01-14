@@ -11,6 +11,11 @@ router = APIRouter(prefix='/movies', tags=['Movies'])
 def get_connection():
     return "Connection ok"
 
+def get_yield_connection():
+    print("Before yield")
+    yield "Connection with yield ok"
+    print("After yield")
+
 @router.get("/{id}", response_model=MovieRead)
 async def get_movie(id : Annotated[int, Path(title= "The id of film", gt=0)], connection = Depends(get_connection)) -> dict:
     dict_movie = await get_movie_from_db(id)
@@ -40,7 +45,8 @@ async def delete_movie(id : Annotated[int, Path(title= "The id of film",gt=0)]) 
     return {"id": id, **dict_movie}
 
 @router.get("/", response_model=list[MovieRead])
-async def get_movies(limit : Annotated[int, Query(title="The number of returned movies", gt=0)]) -> list:
+async def get_movies(limit : Annotated[int, Query(title="The number of returned movies", gt=0)], connection_yield = Depends(get_yield_connection)) -> list:
+    print(connection_yield)
     list_movies = await get_movies_from_db(limit)
     return list_movies
 
